@@ -30,6 +30,7 @@ CREATE TABLE `order_info`(
 	`status` tinyint(4) DEFAULT '0' COMMENT '订单状态，0新建未支付，1已支付，2已发货，3已收货，4已退款，5，已完成',
 	`create_date` datetime DEFAULT NULL COMMENT '订单的创建时间',
 	`pay_date` datetime DEFAULT NULL COMMENT '支付时间',
+	`goods_count` int(11) DEFAULT '0' COMMENT '商品数量',
 	PRIMARY KEY(`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
 
