@@ -9,4 +9,6 @@ public class MiaoshaUserKey extends BasePrefix {
 	}
 	//tk作为前缀来区别其他
 	public static MiaoshaUserKey token = new MiaoshaUserKey(TOKEN_EXPIRE,"tk");
+	//永久保存用户id
+	public static MiaoshaUserKey getById = new MiaoshaUserKey(0,"id");
 }

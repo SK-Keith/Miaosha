@@ -1,6 +1,7 @@
 package com.keith.miaosha.controller;
 
 import com.keith.miaosha.domain.User;
+import com.keith.miaosha.rabbitmq.MQSender;
 import com.keith.miaosha.redis.RedisService;
 import com.keith.miaosha.redis.UserKey;
 import com.keith.miaosha.result.CodeMsg;
@@ -26,11 +27,42 @@ public class SampleController {
     @Autowired
     RedisService redisService;
 
+    @Autowired
+    MQSender sender;
+
     @RequestMapping("/hello")
     @ResponseBody
     public Result<String> home() {
         return Result.success("Hello，world");
     }
+
+//    @RequestMapping("/mq")
+//    @ResponseBody
+//    public Result<String> mq() {
+//        sender.send("hello,keith");
+//        return Result.success("Hello，world");
+//    }
+//
+//    @RequestMapping("/mq/topic")
+//    @ResponseBody
+//    public Result<String> mqTopic() {
+//        sender.sendTopic("hello,keith");
+//        return Result.success("Hello，world");
+//    }
+//
+//    @RequestMapping("/mq/fanout")
+//    @ResponseBody
+//    public Result<String> mqFanout() {
+//        sender.sendFanout("hello,keith");
+//        return Result.success("Hello，world");
+//    }
+//
+//    @RequestMapping("/mq/header")
+//    @ResponseBody
+//    public Result<String> mqHeader() {
+//        sender.sendHeader("hello,keith");
+//        return Result.success("Hello，world");
+//    }
 
     @RequestMapping("/error")
     @ResponseBody
@@ -73,9 +105,9 @@ public class SampleController {
     //删除用户
     @RequestMapping("/redis/del")
     @ResponseBody
-    public Result<Long> del(){
-        Long l = redisService.del(UserKey.getById,""+2);
-        return Result.success(l);
+    public Result<Boolean> del(){
+        boolean b = redisService.delete(UserKey.getById,""+2);
+        return Result.success(b);
     }
     
 }

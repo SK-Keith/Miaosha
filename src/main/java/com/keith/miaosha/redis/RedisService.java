@@ -5,6 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 第二步，利用redisServcie提供服务，下一步，在controller提供方法引用该service
@@ -30,7 +35,6 @@ public class RedisService {
             jedis =  jedisPool.getResource();
             //生成真正
             String realKey  = prefix.getPrefix() + key;
-            System.out.println("get_realKey:"+realKey);
             String  str = jedis.get(realKey);
             T t =  stringToBean(str, clazz);
             return t;
@@ -172,12 +176,71 @@ public class RedisService {
      * @param <T>
      * @return
      */
-    public <T> Long del(KeyPrefix prefix, String key){
+    public boolean delete(KeyPrefix prefix, String key){
         Jedis jedis = null;
-        jedis = jedisPool.getResource();
-        //生成真正的key
-        String realKey = prefix.getPrefix() + key;
-        return jedis.del(realKey);
+        try {
+            jedis = jedisPool.getResource();
+            //生成真正的key
+            String realKey = prefix.getPrefix() + key;
+            long ret = jedis.del(realKey);
+            return ret > 0;
+        }finally {
+            returnToPool(jedis);
+        }
+    }
+
+    /**
+     * 删除指定前缀的值
+     */
+    public boolean delete(KeyPrefix prefix){
+        if (prefix == null)
+            return false;
+        List<String> keys = scanKeys(prefix.getPrefix());
+        if(keys==null || keys.size() <= 0) {
+            return true;
+        }
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            jedis.del(keys.toArray(new String[0]));
+            return true;
+        } catch (final Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if(jedis != null) {
+                jedis.close();
+            }
+        }
+    }
+
+    /**
+     * 查找指定前缀的键
+     */
+    public List<String> scanKeys(String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            List<String> keys = new ArrayList<String>();
+            String cursor = "0";
+            ScanParams sp = new ScanParams();
+            sp.match("*"+key+"*");
+            sp.count(100);
+            do{
+                ScanResult<String> ret = jedis.scan(cursor, sp);
+                List<String> result = ret.getResult();
+                if(result!=null && result.size() > 0){
+                    keys.addAll(result);
+                }
+                //再处理cursor
+                cursor = ret.getStringCursor();
+            }while(!cursor.equals("0"));
+            return keys;
+        } finally {
+            if (jedis != null) {
+                jedis.close();
+            }
+        }
     }
 
     /**
@@ -187,7 +250,7 @@ public class RedisService {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private <T> String beanToString(T value) {
+    public static <T> String beanToString(T value) {
         if(value == null){
             return null;
         }
@@ -204,7 +267,7 @@ public class RedisService {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T stringToBean(String str, Class<T> clazz) {
+    public static <T> T stringToBean(String str, Class<T> clazz) {
         if(str == null || str.length() <= 0 || clazz == null){
             return null;
         }

@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * 分布式session来获取token
  * 根据token获取用户信息
  * @author YMX
  * @date 2019/1/27 11:51
@@ -44,11 +45,14 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
             return null;
         }
         String token = StringUtils.isEmpty(paramToken)?cookieToken:paramToken;
-        return userService.getByToken(token);
+        return userService.getByToken(response, token);
     }
 
     private String getCookieValue(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = request.getCookies();
+        if (cookies == null || cookies.length <= 0 ){
+            return null;
+        }
         for (Cookie cookie : cookies){
             if(cookie.getName().equals(cookieName)){
                 return cookie.getValue();

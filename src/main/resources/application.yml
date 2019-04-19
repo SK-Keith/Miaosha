@@ -1,0 +1,72 @@
+server:
+  port: 8080
+  context-path: /
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+    content-type: text/html
+    enabled: true
+    encoding: utf-8
+    mode: HTML5
+  datasource:
+    url: jdbc:mysql://119.29.5.21:3306/miaosha?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+    username: mysql
+    password: password
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    filters: stat
+    tomcat:
+      #连接池的最大数据库连接数
+      max-active: 1000
+      initial-size: 100
+      #最大建立连接等待时间
+      max-wait: 60000
+      #max-idle数据库连接的最大空闲时间，默认为100
+      #min-idle  超过空闲时间，数据库连接将会被标记为不可用，然后被释放，设为0表示无限制。
+      min-idle: 500
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      #该选项用来验证数据库连接的有效性，指定获取连接时连接校验的sql查询语句
+      validation-query: select '*'
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+  resources:
+    add-mappings: true
+    cache-period: 7200
+    chain:
+      enabled: true
+      gzipped: true
+      html-application-cache: true
+    static-locations: classpath:/static/
+  rabbitmq:
+    host: 119.29.5.21
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    listener:
+      simple:
+        concurrency: 10
+        max-concurrency: 10
+        prefetch: 1
+        auto-startup: true
+        default-requeue-rejected: true
+mybatis:
+  type-aliases-package: com.keith.miaosha.domain
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 3000
+  mapper-locations: classpath:com/keith/miaosha/dao/*.xml
+#redis
+redis:
+  host: 119.29.5.21
+  port: 6388
+  password: 123456
+  pool-max-total: 10000
+  pool-max-idle: 5000
+  pool-max-wait: 5000
+#rabbitmq
