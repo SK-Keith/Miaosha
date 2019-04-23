@@ -11,9 +11,9 @@ spring:
     encoding: utf-8
     mode: HTML5
   datasource:
-    url: jdbc:mysql://119.29.5.21:3306/miaosha?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
-    username: mysql
-    password: password
+    url: jdbc:mysql://localhost:3306/miaosha?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+    username: (your username)
+    password: (your password)
     driver-class-name: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     filters: stat
@@ -42,7 +42,7 @@ spring:
       html-application-cache: true
     static-locations: classpath:/static/
   rabbitmq:
-    host: 119.29.5.21
+    host: localhost
     port: 5672
     username: guest
     password: guest
@@ -63,7 +63,7 @@ mybatis:
   mapper-locations: classpath:com/keith/miaosha/dao/*.xml
 #redis
 redis:
-  host: 119.29.5.21
+  host: localhost
   port: 6388
   password: 123456
   pool-max-total: 10000
